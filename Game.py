@@ -9,10 +9,15 @@ from sentence_transformers import SentenceTransformer
 import joblib  # for loading saved models
 
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
-
 st.markdown(
     """
-    <h1 style='text-align: center; color: black;'>
+    <h1 style='
+        text-align: center; 
+        color: red; 
+        text-shadow: 2px 2px 4px #000000;
+        font-family: "Arial Black", Gadget, sans-serif;
+        letter-spacing: 2px;
+    '>
         🤖 Sentence to Emoji Predictor with Precomputed Embeddings
     </h1>
     """,
