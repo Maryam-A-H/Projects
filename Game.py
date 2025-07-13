@@ -38,7 +38,7 @@ st.markdown(
     """
     <h6 style="color: black; font-style: italic; font-family: 'Georgia', serif; 
                text-align: center; margin-top: 5px;">
-        Really dig into your dataset.
+        Really dig into your dataset. Find out whats there, is it just text ? Whats the distribution of the dataset ? *Most Important Step*
     </h6>
     """,
     unsafe_allow_html=True
