@@ -38,7 +38,7 @@ st.markdown(
     """
     <h6 style="color: black; font-family: 'Georgia', serif; 
                text-align: center; margin-top: 5px;">
-        Really dig into your dataset. Find out what's there, is it just text? What's the distribution of the dataset? <b>Most Important Step</b>
+        Really dig into your dataset. Find out what's there? What's the distribution of the dataset? <b>Most Important Step</b>
     </h6>
     """,
     unsafe_allow_html=True
