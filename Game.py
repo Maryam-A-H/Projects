@@ -50,7 +50,7 @@ st.write("Embeddings shape:", np.array(X_embeddings).shape)
 
 # Encode labels
 label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(data['Emoji'])
+y_encoded = label_encoder.fit_transform(data['Label'])
 
 # Model selection and training
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
