@@ -75,6 +75,30 @@ data = stratified_sample(data_full, sample_frac)
 st.write(f"Using sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
 st.write(data['Label'].value_counts())
 
+import altair as alt
+
+# Count labels in sampled data
+label_counts = data['Label'].value_counts().reset_index()
+label_counts.columns = ['Label', 'Count']
+
+# Map label to emoji using your emoji_mapping dictionary
+label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
+
+# Create a bar chart with emojis on x-axis
+chart = (
+    alt.Chart(label_counts)
+    .mark_bar(color='skyblue')
+    .encode(
+        x=alt.X('Emoji:N', title='Emoji', sort=None),
+        y=alt.Y('Count:Q', title='Count'),
+        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+    )
+    .properties(title="Sampled Data Label Distribution", width=600, height=350)
+)
+
+st.altair_chart(chart, use_container_width=True)
+
+
 # Load emoji mapping
 @st.cache_data
 def load_mapping():
