@@ -9,7 +9,16 @@ from sentence_transformers import SentenceTransformer
 import joblib  # for loading saved models
 
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
-st.title("🤖 Sentence to Emoji Predictor with Precomputed Embeddings")
+
+st.markdown(
+    """
+    <h1 style='text-align: center; color: red;'>
+        🤖 Sentence to Emoji Predictor with Precomputed Embeddings
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Load processed sampled data
 @st.cache_data
