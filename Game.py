@@ -29,7 +29,10 @@ def load_mapping():
     return mapping.squeeze().to_dict()
 
 emoji_mapping = load_mapping()
-st.write("Emoji mapping keys sample:", list(emoji_mapping.keys())[:5])
+st.write("### Emoji Mapping Sample")
+# Display a sample of the mapping with emojis visible
+mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
+st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
 # Embed sentences
 @st.cache_resource
