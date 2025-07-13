@@ -62,6 +62,18 @@ st.write("Data loaded:", data.shape)
 st.write(data.head())
 
 
+# Load emoji mapping
+@st.cache_data
+def load_mapping():
+    mapping = pd.read_csv("Mapping.csv").iloc[:, 1:2]
+    return mapping.squeeze().to_dict()
+
+emoji_mapping = load_mapping()
+st.write("### Emoji Mapping Sample")
+mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
+st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
+
+
 # Perform stratified sampling on full data according to sample_frac
 @st.cache_data
 def stratified_sample(data, frac):
@@ -98,17 +110,6 @@ chart = (
 
 st.altair_chart(chart, use_container_width=True)
 
-
-# Load emoji mapping
-@st.cache_data
-def load_mapping():
-    mapping = pd.read_csv("Mapping.csv").iloc[:, 1:2]
-    return mapping.squeeze().to_dict()
-
-emoji_mapping = load_mapping()
-st.write("### Emoji Mapping Sample")
-mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
-st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
 # Load full embeddings (corresponding to full dataset)
 @st.cache_data
