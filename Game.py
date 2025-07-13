@@ -46,9 +46,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Sidebar: Number of samples per class slider
-n_samples_per_class = st.sidebar.slider(
-    "Number of samples per class", min_value=1, max_value=1000, value=100, step=10
+# Sidebar controls
+sample_frac = st.sidebar.slider(
+    "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
+) / 100.0  # convert to fraction
+
+balanced_sampling = st.sidebar.checkbox(
+    "Use balanced sampling (equal samples per class with resampling)", value=True
 )
 
 # Load full dataset
@@ -73,23 +77,36 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
+# Simple stratified sampling without resampling
+@st.cache_data
+def stratified_sample(data, frac):
+    return data.groupby('Label', group_keys=False).apply(
+        lambda x: x.sample(frac=frac, random_state=42)
+    ).reset_index(drop=True)
+
 # Balanced sampling with resampling if needed
 @st.cache_data
-def balanced_sample(data, n_samples):
+def balanced_sample(data, frac):
+    min_class_size = data['Label'].value_counts().min()
+    n_samples = max(1, int(min_class_size * frac))
+    
     def sample_group(group):
         if len(group) >= n_samples:
             return group.sample(n=n_samples, random_state=42)
         else:
             return group.sample(n=n_samples, replace=True, random_state=42)
-    sampled = data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
-    return sampled
+    
+    return data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
 
-data = balanced_sample(data_full, n_samples_per_class)
+# Choose sampling method based on toggle
+if balanced_sampling:
+    data = balanced_sample(data_full, sample_frac)
+    st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
+else:
+    data = stratified_sample(data_full, sample_frac)
+    st.write(f"Using stratified sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
 
-st.write(f"Using balanced sampled data: {data.shape}")
-st.write(data['Label'].value_counts())
-
-# Bar chart with emojis using Altair
+# Show label counts as bar chart with emojis
 label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
 label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
@@ -102,19 +119,19 @@ chart = (
         y=alt.Y('Count:Q', title='Count'),
         tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
     )
-    .properties(title="Balanced Sampled Data Label Distribution", width=600, height=350)
+    .properties(title="Sampled Data Label Distribution", width=600, height=350)
 )
 
 st.altair_chart(chart, use_container_width=True)
 
-# Load embeddings (for full dataset)
+# Load embeddings (full dataset)
 @st.cache_data
 def load_embeddings():
     return np.load("train_embeddings_sampled.npy")  # Make sure path matches
 
 X_embeddings_full = load_embeddings()
 
-# Get sampled indices and select corresponding embeddings
+# Select embeddings corresponding to sampled data rows
 sampled_indices = data.index.tolist()
 X_embeddings = X_embeddings_full[sampled_indices]
 
