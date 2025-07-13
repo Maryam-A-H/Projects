@@ -57,6 +57,11 @@ def load_data():
 
 data_full = load_data()
 
+data = load_data()
+st.write("Data loaded:", data.shape)
+st.write(data.head())
+
+
 # Perform stratified sampling on full data according to sample_frac
 @st.cache_data
 def stratified_sample(data, frac):
