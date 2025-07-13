@@ -46,17 +46,21 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Sidebar slider for samples per class
-sample_per_class = st.sidebar.slider(
-    "Samples per class", min_value=10, max_value=500, value=100, step=10
+# Sidebar: Number of samples per class slider
+n_samples_per_class = st.sidebar.slider(
+    "Number of samples per class", min_value=1, max_value=1000, value=100, step=10
 )
 
 # Load full dataset
 @st.cache_data
 def load_data():
-    return pd.read_csv("Train_processed_sampled.csv")  # full dataset
+    data = pd.read_csv("Train_processed_sampled.csv")  # full dataset
+    return data
 
 data_full = load_data()
+
+st.write("Full dataset loaded:", data_full.shape)
+st.write(data_full.head())
 
 # Load emoji mapping
 @st.cache_data
@@ -65,20 +69,27 @@ def load_mapping():
     return mapping.squeeze().to_dict()
 
 emoji_mapping = load_mapping()
+st.write("### Emoji Mapping Sample")
+mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
+st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
-# Balanced sampling - sample equal number from each class (without resetting index to keep original indices)
+# Balanced sampling with resampling if needed
 @st.cache_data
-def balanced_sample(data, n_samples_per_class):
-    sampled = data.groupby('Label', group_keys=False).apply(
-        lambda x: x.sample(n=min(len(x), n_samples_per_class), random_state=42)
-    )
+def balanced_sample(data, n_samples):
+    def sample_group(group):
+        if len(group) >= n_samples:
+            return group.sample(n=n_samples, random_state=42)
+        else:
+            return group.sample(n=n_samples, replace=True, random_state=42)
+    sampled = data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
     return sampled
 
-data = balanced_sample(data_full, sample_per_class)
+data = balanced_sample(data_full, n_samples_per_class)
 
-st.write(f"Using sampled data ({sample_per_class} samples per class): {data.shape}")
+st.write(f"Using balanced sampled data: {data.shape}")
+st.write(data['Label'].value_counts())
 
-# Show label counts as a bar chart with emojis
+# Bar chart with emojis using Altair
 label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
 label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
@@ -91,31 +102,32 @@ chart = (
         y=alt.Y('Count:Q', title='Count'),
         tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
     )
-    .properties(title="Sampled Data Label Distribution", width=600, height=350)
+    .properties(title="Balanced Sampled Data Label Distribution", width=600, height=350)
 )
+
 st.altair_chart(chart, use_container_width=True)
 
-# Load full embeddings (for full dataset)
+# Load embeddings (for full dataset)
 @st.cache_data
 def load_embeddings():
-    return np.load("train_embeddings_sampled.npy")  # shape should match full dataset
+    return np.load("train_embeddings_sampled.npy")  # Make sure path matches
 
 X_embeddings_full = load_embeddings()
 
-# Use sampled data indices to get embeddings for sampled rows
+# Get sampled indices and select corresponding embeddings
 sampled_indices = data.index.tolist()
 X_embeddings = X_embeddings_full[sampled_indices]
 
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
-# Encode labels for sampled data
+# Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
 # Model selection dropdown
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
-# Load or train model on sampled data
+# Load or train model
 @st.cache_resource
 def get_model(name, X, y):
     filename = f"{name.lower().replace(' ', '_')}_model.joblib"
@@ -136,7 +148,7 @@ def get_model(name, X, y):
 
 model = get_model(model_option, X_embeddings, y_encoded)
 
-# Embedder for new user inputs
+# Embedder for new inputs
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
