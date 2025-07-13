@@ -10,10 +10,10 @@ from sentence_transformers import SentenceTransformer
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
 st.title("🤖 Sentence to Emoji Predictor with Precomputed Embeddings")
 
-# Sidebar sampling fraction slider
+# Sidebar sampling fraction slider (if needed in future)
 sample_frac = st.sidebar.slider("Sampling fraction per class", min_value=0.01, max_value=1.0, value=0.1, step=0.05)
 
-# Load processed data
+# Load processed sampled data
 @st.cache_data
 def load_data():
     data = pd.read_csv("Train_processed_sampled.csv")
@@ -33,22 +33,17 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
-# 🔥 Load precomputed embeddings
+# Load precomputed embeddings for the sampled data
 @st.cache_data
 def load_embeddings():
     return np.load("train_embeddings_sampled.npy")
 
-X_embeddings_full = load_embeddings()
-
-# Align sampled embeddings by indices
-sampled_indices = data_sampled.index.tolist()
-X_embeddings = X_embeddings_full[sampled_indices]
-
+X_embeddings = load_embeddings()
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
 # Encode labels
 label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(data_sampled['Label'])
+y_encoded = label_encoder.fit_transform(data['Label'])
 
 # Model selection and training
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
@@ -96,3 +91,4 @@ st.write("""
 - Shows different classifier performance.
 - Maps text inputs to emojis as a prediction task.
 """)
+
