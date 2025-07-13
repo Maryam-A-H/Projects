@@ -82,7 +82,7 @@ label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
 
 # Map label to emoji using your emoji_mapping dictionary
-label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
+label_counts['Lable'] = label_counts['Label'].map(emoji_mapping)
 
 # Create a bar chart with emojis on x-axis
 chart = (
