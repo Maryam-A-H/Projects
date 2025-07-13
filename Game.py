@@ -13,7 +13,7 @@ st.markdown(
     """
     <h1 style='
         text-align: center; 
-        color: red; 
+        color: green; 
         text-shadow: 2px 2px 4px #000000;
         font-family: "Arial Black", Gadget, sans-serif;
         letter-spacing: 2px;
