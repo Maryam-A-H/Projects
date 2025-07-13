@@ -25,7 +25,7 @@ st.markdown(
 )
 
 st.write("## Pre-Processed Data Sample")
-st.write("### Really dig into your dataset.")
+st.write("##### Really dig into your dataset.")
 # Load processed sampled data
 @st.cache_data
 def load_data():
