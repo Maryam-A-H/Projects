@@ -75,7 +75,7 @@ st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
 
 # Perform stratified sampling on full data according to sample_frac
-@st.cache_data
+
 @st.cache_data
 def balanced_sample(data, n_samples_per_class):
     sampled = data.groupby('Label', group_keys=False).apply(
@@ -83,7 +83,7 @@ def balanced_sample(data, n_samples_per_class):
     ).reset_index(drop=True)
     return sampled
     
-data = stratified_sample(data_full, sample_frac)
+data = balanced_sample(data_full, sample_frac)
 
 st.write(f"Using sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
 st.write(data['Label'].value_counts())
