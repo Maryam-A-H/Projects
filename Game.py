@@ -26,12 +26,12 @@ st.write("Data loaded:", data.shape)
 # Stratified sample for faster embedding
 @st.cache_data
 def sample_stratified(data, frac):
-    return data.groupby('Emoji', group_keys=False).apply(lambda x: x.sample(frac=frac, random_state=42)).reset_index(drop=True)
+    return data.groupby('Label', group_keys=False).apply(lambda x: x.sample(frac=frac, random_state=42)).reset_index(drop=True)
 
 data_sampled = sample_stratified(data, sample_frac)
 
 st.write(f"Using sampled data: {data_sampled.shape}")
-st.write(data_sampled['Emoji'].value_counts())
+st.write(data_sampled['Label'].value_counts())
 
 # Load mapping
 @st.cache_data
