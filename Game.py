@@ -6,9 +6,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sentence_transformers import SentenceTransformer
-import joblib  # for loading saved models
+import joblib
+import altair as alt
 
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
+
 st.markdown(
     """
     <h1 style='
@@ -44,23 +46,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Sidebar: Sampling fraction slider
-sample_frac = st.sidebar.slider(
-    "Sampling fraction per class", min_value=0.01, max_value=1.0, value=0.1, step=0.05
+# Sidebar slider for samples per class
+sample_per_class = st.sidebar.slider(
+    "Samples per class", min_value=10, max_value=500, value=100, step=10
 )
 
-# Load processed sampled data (full dataset)
+# Load full dataset
 @st.cache_data
 def load_data():
-    data = pd.read_csv("Train_processed_sampled.csv")  # full dataset
-    return data
+    return pd.read_csv("Train_processed_sampled.csv")  # full dataset
 
 data_full = load_data()
-
-data = load_data()
-st.write("Data loaded:", data.shape)
-st.write(data.head())
-
 
 # Load emoji mapping
 @st.cache_data
@@ -69,35 +65,24 @@ def load_mapping():
     return mapping.squeeze().to_dict()
 
 emoji_mapping = load_mapping()
-st.write("### Emoji Mapping Sample")
-mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
-st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
-
-# Perform stratified sampling on full data according to sample_frac
-
+# Balanced sampling - sample equal number from each class (without resetting index to keep original indices)
 @st.cache_data
 def balanced_sample(data, n_samples_per_class):
     sampled = data.groupby('Label', group_keys=False).apply(
         lambda x: x.sample(n=min(len(x), n_samples_per_class), random_state=42)
-    ).reset_index(drop=True)
+    )
     return sampled
-    
-data = balanced_sample(data_full, sample_frac)
 
-st.write(f"Using sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
-st.write(data['Label'].value_counts())
+data = balanced_sample(data_full, sample_per_class)
 
-import altair as alt
+st.write(f"Using sampled data ({sample_per_class} samples per class): {data.shape}")
 
-# Count labels in sampled data
+# Show label counts as a bar chart with emojis
 label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
+label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
 
-# Map label to emoji using your emoji_mapping dictionary
-label_counts['Lable'] = label_counts['Label'].map(emoji_mapping)
-
-# Create a bar chart with emojis on x-axis
 chart = (
     alt.Chart(label_counts)
     .mark_bar(color='skyblue')
@@ -108,31 +93,29 @@ chart = (
     )
     .properties(title="Sampled Data Label Distribution", width=600, height=350)
 )
-
 st.altair_chart(chart, use_container_width=True)
 
-
-# Load full embeddings (corresponding to full dataset)
+# Load full embeddings (for full dataset)
 @st.cache_data
 def load_embeddings():
-    return np.load("train_embeddings_sampled.npy")  # embeddings for full dataset
+    return np.load("train_embeddings_sampled.npy")  # shape should match full dataset
 
 X_embeddings_full = load_embeddings()
 
-# Align sampled embeddings using sampled data indices
+# Use sampled data indices to get embeddings for sampled rows
 sampled_indices = data.index.tolist()
 X_embeddings = X_embeddings_full[sampled_indices]
 
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
-# Encode labels
+# Encode labels for sampled data
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
 # Model selection dropdown
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
-# Load saved models or train on sampled data
+# Load or train model on sampled data
 @st.cache_resource
 def get_model(name, X, y):
     filename = f"{name.lower().replace(' ', '_')}_model.joblib"
@@ -153,7 +136,7 @@ def get_model(name, X, y):
 
 model = get_model(model_option, X_embeddings, y_encoded)
 
-# Embedder for new inputs
+# Embedder for new user inputs
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
