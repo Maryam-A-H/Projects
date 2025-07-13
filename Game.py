@@ -12,7 +12,7 @@ st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
 
 st.markdown(
     """
-    <h1 style='text-align: center; color: pink;'>
+    <h1 style='text-align: center; color: black;'>
         🤖 Sentence to Emoji Predictor with Precomputed Embeddings
     </h1>
     """,
