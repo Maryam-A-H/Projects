@@ -42,7 +42,7 @@ embedder = get_embedder()
 def embed_texts(texts):
     return embedder.encode(texts, convert_to_tensor=False)
 
-X_embeddings = embed_texts(data['Text'])
+X_embeddings = embed_texts(data['TEXT'])
 st.write("Embeddings shape:", np.array(X_embeddings).shape)
 
 # Encode labels
