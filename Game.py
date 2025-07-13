@@ -26,23 +26,24 @@ st.markdown(
 
 st.markdown(
     """
-    <h2 style="color: #4B0082; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    <h3 style="color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
                text-align: center; margin-bottom: 0;">
         Pre-Processed Data Sample
-    </h2>
+    </h3>
     """,
     unsafe_allow_html=True
 )
 
 st.markdown(
     """
-    <h5 style="color: #6A5ACD; font-style: italic; font-family: 'Georgia', serif; 
+    <h6 style="color: black; font-style: italic; font-family: 'Georgia', serif; 
                text-align: center; margin-top: 5px;">
         Really dig into your dataset.
-    </h5>
+    </h6>
     """,
     unsafe_allow_html=True
 )
+
 
 # Load processed sampled data
 @st.cache_data
