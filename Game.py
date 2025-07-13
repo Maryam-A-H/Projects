@@ -44,15 +44,31 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Load processed sampled data
+# Sidebar: Sampling fraction slider
+sample_frac = st.sidebar.slider(
+    "Sampling fraction per class", min_value=0.01, max_value=1.0, value=0.1, step=0.05
+)
+
+# Load processed sampled data (full dataset)
 @st.cache_data
 def load_data():
-    data = pd.read_csv("Train_processed_sampled.csv")  # sampled CSV with 'Label' and 'TEXT'
+    data = pd.read_csv("Train_processed_sampled.csv")  # full dataset
     return data
 
-data = load_data()
-st.write("Data loaded:", data.shape)
-st.write(data.head())
+data_full = load_data()
+
+# Perform stratified sampling on full data according to sample_frac
+@st.cache_data
+def stratified_sample(data, frac):
+    sampled = data.groupby('Label', group_keys=False).apply(
+        lambda x: x.sample(frac=frac, random_state=42)
+    ).reset_index(drop=True)
+    return sampled
+
+data = stratified_sample(data_full, sample_frac)
+
+st.write(f"Using sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
+st.write(data['Label'].value_counts())
 
 # Load emoji mapping
 @st.cache_data
@@ -65,13 +81,18 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
-# Load precomputed embeddings (aligned with data rows)
+# Load full embeddings (corresponding to full dataset)
 @st.cache_data
 def load_embeddings():
-    return np.load("train_embeddings_sampled.npy")
+    return np.load("train_embeddings_sampled.npy")  # embeddings for full dataset
 
-X_embeddings = load_embeddings()
-st.write("Embeddings shape:", X_embeddings.shape)
+X_embeddings_full = load_embeddings()
+
+# Align sampled embeddings using sampled data indices
+sampled_indices = data.index.tolist()
+X_embeddings = X_embeddings_full[sampled_indices]
+
+st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
 # Encode labels
 label_encoder = LabelEncoder()
@@ -80,29 +101,28 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 # Model selection dropdown
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
-# Load saved models if available, else train and save them
+# Load saved models or train on sampled data
 @st.cache_resource
-def get_model(name):
+def get_model(name, X, y):
     filename = f"{name.lower().replace(' ', '_')}_model.joblib"
     try:
         model = joblib.load(filename)
         st.write(f"Loaded saved {name} model.")
     except Exception:
-        # Train model if not found
         if name == "Logistic Regression":
             model = LogisticRegression(max_iter=1000)
         elif name == "Random Forest":
             model = RandomForestClassifier()
         else:
             model = SVC(probability=True)
-        model.fit(X_embeddings, y_encoded)
+        model.fit(X, y)
         joblib.dump(model, filename)
         st.write(f"Trained and saved {name} model.")
     return model
 
-model = get_model(model_option)
+model = get_model(model_option, X_embeddings, y_encoded)
 
-# Embedder for new user inputs
+# Embedder for new inputs
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
@@ -130,6 +150,8 @@ st.write("""
 - Uses precomputed sentence embeddings for fast training.
 - Loads or trains multiple classifiers.
 - Maps text inputs to emojis as a prediction task.
+- Lets you dynamically sample your dataset for fast experimentation.
 """)
+
 
 
