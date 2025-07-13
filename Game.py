@@ -6,17 +6,15 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sentence_transformers import SentenceTransformer
+import joblib  # for loading saved models
 
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
 st.title("🤖 Sentence to Emoji Predictor with Precomputed Embeddings")
 
-# Sidebar sampling fraction slider
-sample_frac = st.sidebar.slider("Sampling fraction per class", min_value=0.01, max_value=1.0, value=0.1, step=0.05)
-
 # Load processed sampled data
 @st.cache_data
 def load_data():
-    data = pd.read_csv("Train_processed_sampled.csv")  # your sampled CSV with 'Label' and 'TEXT' columns
+    data = pd.read_csv("Train_processed_sampled.csv")  # sampled CSV with 'Label' and 'TEXT'
     return data
 
 data = load_data()
@@ -34,40 +32,44 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
-# Load precomputed embeddings
+# Load precomputed embeddings (aligned with data rows)
 @st.cache_data
 def load_embeddings():
-    return np.load("train_embeddings_sampled.npy")  # make sure this path is correct
+    return np.load("train_embeddings_sampled.npy")
 
-X_embeddings_full = load_embeddings()
-
-# Here, no resampling on embeddings — assume embeddings correspond to all rows in `Train_processed_sampled.csv`
-# So no indexing needed, embeddings and data should align
-X_embeddings = X_embeddings_full
-
-st.write("Embeddings shape (sampled):", X_embeddings.shape)
+X_embeddings = load_embeddings()
+st.write("Embeddings shape:", X_embeddings.shape)
 
 # Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
-# Model selection and training (outside cached functions)
+# Model selection dropdown
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
+# Load saved models if available, else train and save them
 @st.cache_resource
-def train_model(X, y, model_name):
-    if model_name == "Logistic Regression":
-        model = LogisticRegression(max_iter=1000)
-    elif model_name == "Random Forest":
-        model = RandomForestClassifier()
-    else:
-        model = SVC()
-    model.fit(X, y)
+def get_model(name):
+    filename = f"{name.lower().replace(' ', '_')}_model.joblib"
+    try:
+        model = joblib.load(filename)
+        st.write(f"Loaded saved {name} model.")
+    except Exception:
+        # Train model if not found
+        if name == "Logistic Regression":
+            model = LogisticRegression(max_iter=1000)
+        elif name == "Random Forest":
+            model = RandomForestClassifier()
+        else:
+            model = SVC(probability=True)
+        model.fit(X_embeddings, y_encoded)
+        joblib.dump(model, filename)
+        st.write(f"Trained and saved {name} model.")
     return model
 
-model = train_model(X_embeddings, y_encoded, model_option)
+model = get_model(model_option)
 
-# Embedder for new inputs only
+# Embedder for new user inputs
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
@@ -93,7 +95,7 @@ st.markdown("---")
 st.markdown("### 🧠 How does this teach Data Science?")
 st.write("""
 - Uses precomputed sentence embeddings for fast training.
-- Shows different classifier performance.
+- Loads or trains multiple classifiers.
 - Maps text inputs to emojis as a prediction task.
 """)
 
