@@ -24,8 +24,26 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.write("## Pre-Processed Data Sample")
-st.write("##### Really dig into your dataset.")
+st.markdown(
+    """
+    <h2 style="color: #4B0082; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+               text-align: center; margin-bottom: 0;">
+        Pre-Processed Data Sample
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
+    <h5 style="color: #6A5ACD; font-style: italic; font-family: 'Georgia', serif; 
+               text-align: center; margin-top: 5px;">
+        Really dig into your dataset.
+    </h5>
+    """,
+    unsafe_allow_html=True
+)
+
 # Load processed sampled data
 @st.cache_data
 def load_data():
