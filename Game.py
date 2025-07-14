@@ -130,6 +130,8 @@ if col3.button("Simple Random Sampling"):
 # If no sampling button clicked yet
 if data is None:
     st.write("No sampling method selected yet.")
+    data = balanced_sample(data_full, sample_frac)
+    
 else:
     # Show sample only if data is available
     st.write("### Sampled data preview")
