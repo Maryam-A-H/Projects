@@ -47,7 +47,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
+st.write("## Pre-Processing Data")
 # Sidebar controls
 sample_frac = st.sidebar.slider(
     "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
