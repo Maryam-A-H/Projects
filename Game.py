@@ -77,11 +77,11 @@ def load_mapping():
 emoji_mapping = load_mapping()
 
 # Map labels to emojis before displaying
-data_full["Emoji"] = data_full["label_column"].map(emoji_mapping)
+data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
 st.write("Full dataset loaded:", data_full.shape)
 st.write("### Sample with Emoji mapped")
-st.write(data_full.sample(15)[["text_column", "label_column", "Emoji"]])  # adjust column names
+st.write(data_full.sample(15)[["TEXT", "Label", "Emoji"]])  # adjust column names
 
 # Show emoji mapping sample
 st.write("### Emoji Mapping Sample")
