@@ -66,7 +66,7 @@ def load_data():
 data_full = load_data()
 
 st.write("Full dataset loaded:", data_full.shape)
-st.write(data_full.head(15))
+st.write(data_full.sample(15))
 
 # Load emoji mapping
 @st.cache_data
