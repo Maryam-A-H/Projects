@@ -26,25 +26,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(
+# This will just print the HTML as text, not render it.
+st.write(
     """
     <h3 style="color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
                text-align: left; margin-bottom: 0;">
         Pre-Processed Data Sample
     </h3>
-    """,
-    unsafe_allow_html=True
+    """
 )
 
-st.markdown(
+st.write(
     """
     <h6 style="color: black; font-family: 'Georgia', serif; 
                text-align: center; margin-top: 5px;">
         Really dig into your dataset. Find out what's there? What's the distribution of the dataset? <b>Most Important Step</b>
     </h6>
-    """,
-    unsafe_allow_html=True
+    """
 )
+
 
 # Sidebar controls
 sample_frac = st.sidebar.slider(
