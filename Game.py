@@ -71,8 +71,19 @@ st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
 ### NEW 
 
-# Define sampling functions
+import streamlit as st
+import pandas as pd
 
+st.write("### Sampling")
+
+# Load full dataset
+@st.cache_data
+def load_data():
+    return pd.read_csv("Train_processed_sampled.csv")
+
+data_full = load_data()
+
+# Define sampling functions
 @st.cache_data
 def stratified_sample(data, frac):
     return data.groupby('Label', group_keys=False).apply(
@@ -101,29 +112,25 @@ sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
 
 # Buttons for sampling methods
 col1, col2, col3 = st.columns(3)
-# Initialize variables
-data = None
-method = None
-
-# Sampling fraction input
-sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
-
-# Buttons for sampling methods
-col1, col2, col3 = st.columns(3)
 
 if col1.button("Stratified Sampling"):
     data = stratified_sample(data_full, sample_frac)
-    method = "Stratified Sampling"
+    st.write(f"Using stratified sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
+    st.write(data.sample(10))
 
 elif col2.button("Balanced Sampling"):
     data = balanced_sample(data_full, sample_frac)
-    method = "Balanced Sampling"
+    st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
+    st.write(data.sample(10))
 
 elif col3.button("Simple Random Sampling"):
     data = simple_random_sample(data_full, sample_frac)
-    method = "Simple Random Sampling"
+    st.write(f"Using simple random sampled data ({sample_frac*100:.1f}% of total data): {data.shape}")
+    st.write(data.sample(10))
 
-# Show results if data is sampled
+else:
+    st.write("No sampling method selected yet.")
+
 
 ###NEW
 
