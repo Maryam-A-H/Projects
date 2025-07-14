@@ -29,7 +29,7 @@ st.markdown(
 st.markdown(
     """
     <h3 style="color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-               text-align: center; margin-bottom: 0;">
+               text-align: left; margin-bottom: 0;">
         Pre-Processed Data Sample
     </h3>
     """,
