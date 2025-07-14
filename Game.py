@@ -20,7 +20,7 @@ st.markdown(
         font-family: "Arial Black", Gadget, sans-serif;
         letter-spacing: 2px;
     '>
-        🤖 Sentence to Emoji Predictor with Precomputed Embeddings
+        🤖 Sentence to Emoji Predictor
     </h1>
     """,
     unsafe_allow_html=True
