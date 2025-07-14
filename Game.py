@@ -68,25 +68,6 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
- # Show label counts as bar chart with emojis
-label_counts = data['Label'].value_counts().reset_index()
-label_counts.columns = ['Label', 'Count']
-label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
-
-chart = (
-    alt.Chart(label_counts)
-    .mark_bar(color='skyblue')
-    .encode(
-        x=alt.X('Emoji:N', title='Emoji', sort=None),
-        y=alt.Y('Count:Q', title='Count'),
-        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
-    )
-    .properties(title="Sampled Data Label Distribution", width=600, height=350)
-)
-
-st.altair_chart(chart, use_container_width=True)
-
-
 ### NEW 
 
 import streamlit as st
@@ -134,21 +115,18 @@ col1, col2, col3 = st.columns(3)
 if col1.button("Stratified Sampling"):
     data = stratified_sample(data_full, sample_frac)
     st.write(f"Using stratified sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
-    st.write(data.sample(10))
 
 elif col2.button("Balanced Sampling"):
     data = balanced_sample(data_full, sample_frac)
     st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
-    st.write(data.sample(10))
+
 
 elif col3.button("Simple Random Sampling"):
     data = simple_random_sample(data_full, sample_frac)
     st.write(f"Using simple random sampled data ({sample_frac*100:.1f}% of total data): {data.shape}")
-    st.write(data.sample(10))
 
 else:
     st.write("No sampling method selected yet.")
-
 
 ###NEW
 
