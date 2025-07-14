@@ -48,7 +48,6 @@ st.markdown(
 )
 
 
-
 # Sidebar controls
 sample_frac = st.sidebar.slider(
     "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
@@ -67,7 +66,7 @@ def load_data():
 data_full = load_data()
 
 st.write("Full dataset loaded:", data_full.shape)
-st.write(data_full.head())
+st.write(data_full.head(15))
 
 # Load emoji mapping
 @st.cache_data
