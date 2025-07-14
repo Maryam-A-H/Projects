@@ -26,24 +26,27 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# This will just print the HTML as text, not render it.
-st.write(
+st.markdown(
     """
-    <h3 style="color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-               text-align: left; margin-bottom: 0;">
+    <div style="color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                text-align: left; margin-bottom: 4px; font-size: 20px; font-weight: 600;">
         Pre-Processed Data Sample
-    </h3>
-    """
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-st.write(
+st.markdown(
     """
-    <h6 style="color: black; font-family: 'Georgia', serif; 
-               text-align: center; margin-top: 5px;">
-        Really dig into your dataset. Find out what's there? What's the distribution of the dataset? <b>Most Important Step</b>
-    </h6>
-    """
+    <div style="color: black; font-family: 'Georgia', serif; 
+                text-align: left; margin-top: 2px; font-size: 13px;">
+        Really dig into your dataset. Find out what's there? What's the distribution of the dataset? 
+        <b>Most Important Step</b>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
+
 
 
 # Sidebar controls
