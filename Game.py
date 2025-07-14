@@ -132,8 +132,6 @@ if data is None:
     st.write("No sampling method selected yet.")
     data = balanced_sample(data_full, sample_frac)
     
-# Show bar chart of label distribution with emojis
-st.write("### Sampled Data Label Distribution")
 
 # Prepare label counts with emoji mapping
 label_counts = data['Label'].value_counts().reset_index()
