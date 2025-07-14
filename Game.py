@@ -108,29 +108,32 @@ def simple_random_sample(data, frac):
 
 # Sampling fraction input
 sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
+# Initialize data to None before sampling
+data = None
 
 # Buttons for sampling methods
 col1, col2, col3 = st.columns(3)
 
+# Always show buttons and determine sampling method
 if col1.button("Stratified Sampling"):
     data = stratified_sample(data_full, sample_frac)
     st.write(f"Using stratified sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
 
-elif col2.button("Balanced Sampling"):
+if col2.button("Balanced Sampling"):
     data = balanced_sample(data_full, sample_frac)
     st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
 
-
-elif col3.button("Simple Random Sampling"):
+if col3.button("Simple Random Sampling"):
     data = simple_random_sample(data_full, sample_frac)
     st.write(f"Using simple random sampled data ({sample_frac*100:.1f}% of total data): {data.shape}")
 
-else:
+# If no sampling button clicked yet
+if data is None:
     st.write("No sampling method selected yet.")
-
-###NEW
-
-st.write(data.sample(15))
+else:
+    # Show sample only if data is available
+    st.write("### Sampled data preview")
+    st.write(data.sample(15))
 
 
 
