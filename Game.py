@@ -214,8 +214,8 @@ if sentence:
     st.write(f"Model used: **{model_option}**")
 
 predicted_emoji = emoji_mapping.get(prediction_label)
-if predicted_emoji is None:
-    predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
+predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
+st.markdown(f"### Predicted Emoji: {predicted_emoji}")
 st.markdown("---")
 st.markdown("### 🧠 How does this teach Data Science?")
 st.write("""
