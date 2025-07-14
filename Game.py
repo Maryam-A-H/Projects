@@ -64,7 +64,7 @@ st.write("### Sample with Emoji Mapped")
 st.write(data_full.sample(15)[["TEXT", "Label", "Emoji"]])  # adjust column names
 
 # Show emoji mapping sample
-st.write("### Emoji Mapping Sample")
+st.write("### Emoji Mapping Dataset")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
@@ -129,6 +129,8 @@ else:
     st.write("No sampling method selected yet.")
 
 ###NEW
+
+st.write(data.sample(15))
 
 
 
