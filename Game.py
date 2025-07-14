@@ -208,14 +208,12 @@ if sentence:
     sentence_embedding = embed_sentence(sentence)
     prediction_encoded = model.predict(sentence_embedding)[0]
     prediction_label = label_encoder.inverse_transform([prediction_encoded])[0]
-    
     predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
     st.markdown(f"### Predicted Emoji: {predicted_emoji}")
     st.write(f"Model used: **{model_option}**")
 
-predicted_emoji = emoji_mapping.get(prediction_label)
-predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
-st.markdown(f"### Predicted Emoji: {predicted_emoji}")
+)
+st.markdown(f"### Predicted Emoji: {prediction_label}")
 st.markdown("---")
 st.markdown("### 🧠 How does this teach Data Science?")
 st.write("""
