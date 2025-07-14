@@ -68,6 +68,24 @@ st.write("### Emoji Mapping Sample")
 mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
 st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 
+ # Show label counts as bar chart with emojis
+label_counts = data['Label'].value_counts().reset_index()
+label_counts.columns = ['Label', 'Count']
+label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
+
+chart = (
+    alt.Chart(label_counts)
+    .mark_bar(color='skyblue')
+    .encode(
+        x=alt.X('Emoji:N', title='Emoji', sort=None),
+        y=alt.Y('Count:Q', title='Count'),
+        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+    )
+    .properties(title="Sampled Data Label Distribution", width=600, height=350)
+)
+
+st.altair_chart(chart, use_container_width=True)
+
 
 ### NEW 
 
