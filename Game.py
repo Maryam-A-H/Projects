@@ -72,6 +72,7 @@ st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
 ### NEW 
 
 # Define sampling functions
+
 @st.cache_data
 def stratified_sample(data, frac):
     return data.groupby('Label', group_keys=False).apply(
@@ -119,25 +120,39 @@ elif col3.button("Simple Random Sampling"):
 else:
     st.write("No sampling method selected yet.")
     
+# Show results if data is sampled
+if data is not None:
+    st.write(f"Using {method} ({sample_frac*100:.1f}% sample): {data.shape}")
+    st.write(data.sample(10))
 
-# NEWWWW
-# Show label counts as bar chart with emojis
-label_counts = data['Label'].value_counts().reset_index()
-label_counts.columns = ['Label', 'Count']
-label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
+    # Prepare label counts with emoji mapping for chart
+    label_counts = data['Label'].value_counts().reset_index()
+    label_counts.columns = ['Label', 'Count']
+    label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
 
-chart = (
-    alt.Chart(label_counts)
-    .mark_bar(color='skyblue')
-    .encode(
-        x=alt.X('Emoji:N', title='Emoji', sort=None),
-        y=alt.Y('Count:Q', title='Count'),
-        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+    # Handle missing emojis if any label not in mapping
+    label_counts['Emoji'] = label_counts['Emoji'].fillna(label_counts['Label'].astype(str))
+
+    # Display bar chart with emojis
+    chart = (
+        alt.Chart(label_counts)
+        .mark_bar(color='skyblue')
+        .encode(
+            x=alt.X('Emoji:N', title='Emoji', sort=None),
+            y=alt.Y('Count:Q', title='Count'),
+            tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+        )
+        .properties(title=f"{method} Label Distribution", width=600, height=350)
     )
-    .properties(title="Sampled Data Label Distribution", width=600, height=350)
-)
 
-st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
+
+else:
+    st.write("No sampling method selected yet.")
+
+###NEW
+
+
 
 # Load embeddings (full dataset)
 @st.cache_data
