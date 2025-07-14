@@ -29,13 +29,7 @@ st.markdown(
 st.write("## Pre-Processing Data")
 st.write("##### Really dig into your dataset. Find out what's there? What's the distribution of the dataset? * Most Important*")
 # Sidebar controls
-sample_frac = st.sidebar.slider(
-    "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
-) / 100.0  # convert to fraction
 
-balanced_sampling = st.sidebar.checkbox(
-    "Use balanced sampling (equal samples per class with resampling)", value=True
-)
 
 import streamlit as st
 import pandas as pd
