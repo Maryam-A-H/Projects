@@ -212,7 +212,6 @@ if sentence:
     st.markdown(f"### Predicted Emoji: {predicted_emoji}")
     st.write(f"Model used: **{model_option}**")
 
-)
 st.markdown(f"### Predicted Emoji: {prediction_label}")
 st.markdown("---")
 st.markdown("### 🧠 How does this teach Data Science?")
