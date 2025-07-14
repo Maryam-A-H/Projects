@@ -27,7 +27,7 @@ st.markdown(
 )
 
 st.write("## Pre-Processing Data")
-st.write("### Really dig into your dataset. Find out what's there? What's the distribution of the dataset? * Most Important*")
+st.write("##### Really dig into your dataset. Find out what's there? What's the distribution of the dataset? * Most Important*")
 # Sidebar controls
 sample_frac = st.sidebar.slider(
     "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
