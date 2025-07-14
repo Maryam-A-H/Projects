@@ -135,9 +135,7 @@ if data is None:
 else:
     # Show sample only if data is available
     st.write("### Sampled data preview")
-    st.write(data.sample(15))
-
-
+    
 # Show bar chart of label distribution with emojis
 st.write("### Sampled Data Label Distribution")
 
