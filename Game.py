@@ -138,7 +138,32 @@ else:
     st.write(data.sample(15))
 
 
+# Show bar chart of label distribution with emojis
+st.write("### Sampled Data Label Distribution")
 
+# Prepare label counts with emoji mapping
+label_counts = data['Label'].value_counts().reset_index()
+label_counts.columns = ['Label', 'Count']
+label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping)
+
+# Handle missing emojis if any label not in mapping
+label_counts['Emoji'] = label_counts['Emoji'].fillna(label_counts['Label'].astype(str))
+
+# Display bar chart with emojis
+chart = (
+    alt.Chart(label_counts)
+    .mark_bar(color='skyblue')
+    .encode(
+        x=alt.X('Emoji:N', title='Emoji', sort=None),
+        y=alt.Y('Count:Q', title='Count'),
+        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+    )
+    .properties(title="Sampled Data Label Distribution", width=600, height=350)
+)
+
+st.altair_chart(chart, use_container_width=True)
+
+##N#@@@
 # Load embeddings (full dataset)
 @st.cache_data
 def load_embeddings():
