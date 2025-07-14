@@ -101,27 +101,30 @@ sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
 
 # Buttons for sampling methods
 col1, col2, col3 = st.columns(3)
+# Initialize variables
+data = None
+method = None
+
+# Sampling fraction input
+sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
+
+# Buttons for sampling methods
+col1, col2, col3 = st.columns(3)
 
 if col1.button("Stratified Sampling"):
     data = stratified_sample(data_full, sample_frac)
-    st.write(f"Using stratified sampled data ({sample_frac*100:.1f}% per class): {data.shape}")
-    st.write(data.sample(10))
+    method = "Stratified Sampling"
 
 elif col2.button("Balanced Sampling"):
     data = balanced_sample(data_full, sample_frac)
-    st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
-    st.write(data.sample(10))
+    method = "Balanced Sampling"
 
 elif col3.button("Simple Random Sampling"):
     data = simple_random_sample(data_full, sample_frac)
-    st.write(f"Using simple random sampled data ({sample_frac*100:.1f}% of total data): {data.shape}")
-    st.write(data.sample(10))
+    method = "Simple Random Sampling"
 
-else:
-    st.write("No sampling method selected yet.")
-    
 # Show results if data is sampled
-if data is not None:
+if data is not None and method is not None:
     st.write(f"Using {method} ({sample_frac*100:.1f}% sample): {data.shape}")
     st.write(data.sample(10))
 
@@ -149,7 +152,6 @@ if data is not None:
 
 else:
     st.write("No sampling method selected yet.")
-
 ###NEW
 
 
