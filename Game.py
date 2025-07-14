@@ -54,7 +54,7 @@ emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
 st.write("Full dataset loaded:", data_full.shape)
-st.write("### Sample with Emoji Mapped")
+st.write("### Sample Twitter Text with Emoji")
 st.write(data_full.sample(15)[["TEXT", "Label", "Emoji"]])  # adjust column names
 
 # Show emoji mapping sample
