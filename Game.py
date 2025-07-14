@@ -40,14 +40,15 @@ st.markdown(
     """
     <div style="color: black; font-family: 'Georgia', serif; 
                 text-align: left; margin-top: 2px; font-size: 13px;">
-        Really dig into your dataset. Find out what's there? What's the distribution of the dataset? 
-        <b>Most Important Step</b>
+        
     </div>
     """,
     unsafe_allow_html=True
 )
 
 st.write("## Pre-Processing Data")
+
+st.write("### Really dig into your dataset. Find out what's there? What's the distribution of the dataset?  <b>Most Important Step</b>')
 # Sidebar controls
 sample_frac = st.sidebar.slider(
     "Sampling fraction per class (percentage)", min_value=1, max_value=100, value=10, step=1
