@@ -57,6 +57,38 @@ balanced_sampling = st.sidebar.checkbox(
     "Use balanced sampling (equal samples per class with resampling)", value=True
 )
 
+import streamlit as st
+import pandas as pd
+
+# Load full dataset
+@st.cache_data
+def load_data():
+    data = pd.read_csv("Train_processed_sampled.csv")  # full dataset
+    return data
+
+data_full = load_data()
+
+# Load emoji mapping
+@st.cache_data
+def load_mapping():
+    mapping = pd.read_csv("Mapping.csv").iloc[:, 1:2]
+    return mapping.squeeze().to_dict()
+
+emoji_mapping = load_mapping()
+
+# Map labels to emojis before displaying
+data_full["Emoji"] = data_full["label_column"].map(emoji_mapping)
+
+st.write("Full dataset loaded:", data_full.shape)
+st.write("### Sample with Emoji mapped")
+st.write(data_full.sample(15)[["text_column", "label_column", "Emoji"]])  # adjust column names
+
+# Show emoji mapping sample
+st.write("### Emoji Mapping Sample")
+mapping_sample = {k: v for k, v in list(emoji_mapping.items())[:20]}
+st.write(pd.DataFrame(list(mapping_sample.items()), columns=["Label", "Emoji"]))
+
+# newwww
 # Load full dataset
 @st.cache_data
 def load_data():
