@@ -214,24 +214,6 @@ def get_model(name, X, y, sampling_type):
         st.write(f"Trained and saved {name} model for {sampling_type} sampling.")
     return model
 
-@st.cache_resource
-def get_model(name, X, y):
-    filename = f"{name.lower().replace(' ', '_')}_model.joblib"
-    try:
-        model = joblib.load(filename)
-        st.write(f"Loaded saved {name} model.")
-    except Exception:
-        if name == "Logistic Regression":
-            model = LogisticRegression(max_iter=1000)
-        elif name == "Random Forest":
-            model = RandomForestClassifier()
-        else:
-            model = SVC(probability=True)
-        model.fit(X, y)
-        joblib.dump(model, filename)
-        st.write(f"Trained and saved {name} model.")
-    
-    #return model
 
 model = get_model(model_option, X_embeddings, y_encoded)
 
@@ -250,6 +232,7 @@ sentence = st.text_input("Write a sentence:", "I love pizza")
 
 if sentence:
     sentence_embedding = embed_sentence(sentence)
+    sentence_embedding = np.atleast_2d(sentence_embedding)
     prediction_encoded = model.predict(sentence_embedding)[0]
     prediction_label = label_encoder.inverse_transform([prediction_encoded])[0]
     predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
