@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
 from sentence_transformers import SentenceTransformer
 import joblib
 import altair as alt
@@ -85,14 +84,13 @@ This way, you don’t just get really good at recognizing cats but also recogniz
 It helps the computer not to be lazy and guess only the most common thing.
 """)
 
-
 col1, col2 = st.columns(2)
 with col1:
     sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
 with col2:
     sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced"])
 
-# Sampling functions
+# Sampling functions without simple random
 @st.cache_data
 def stratified_sample(data, frac):
     return data.groupby('Label', group_keys=False).apply(
@@ -101,17 +99,13 @@ def stratified_sample(data, frac):
 
 @st.cache_data
 def balanced_sample(data):
-    n_samples = 500 * sample_frac
+    n_samples = int(500 * sample_frac)
     def sample_group(group):
         if len(group) >= n_samples:
-            return group.sample(n=int(n_samples), random_state=42)
+            return group.sample(n=n_samples, random_state=42)
         else:
-            return group.sample(n=int(n_samples), replace=True, random_state=42)
+            return group.sample(n=n_samples, replace=True, random_state=42)
     return data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
-
-@st.cache_data
-def simple_random_sample(data, frac):
-    return data.sample(frac=frac, random_state=42).reset_index(drop=True)
 
 # Apply sampling
 with st.spinner("Sampling data..."):
@@ -145,8 +139,7 @@ chart = (
 )
 st.altair_chart(chart, use_container_width=True)
 
-
-# 5. Model selection
+# 5. Model selection (only Logistic Regression and Random Forest)
 st.markdown("## 🧠 Choose a Model")
 
 model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest"])
@@ -155,8 +148,7 @@ model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Fore
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
-
-# Load or train model
+# Load or train model with caching
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
     if sampling_type == "Balanced":
@@ -168,9 +160,10 @@ def get_model(name, X, y, sampling_type):
         model = joblib.load(filename)
     except Exception:
         if name == "Logistic Regression":
-            model = LogisticRegression(max_iter=1000)
-        elif name == "Random Forest":
-            model = RandomForestClassifier()
+            model = LogisticRegression(max_iter=500, solver='liblinear')  # faster solver & fewer iterations
+        else:
+            model = RandomForestClassifier(n_estimators=50, max_depth=10, random_state=42)  # smaller forest
+
         model.fit(X, y)
         joblib.dump(model, filename)
     return model
@@ -213,6 +206,7 @@ st.markdown("""
 Built by [Your Name] | 🤖 AI Emoji Predictor | 📝 [GitHub](your-repo-link)
 </p>
 """, unsafe_allow_html=True)
+
 
 
 
