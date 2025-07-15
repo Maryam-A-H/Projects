@@ -45,7 +45,7 @@ st.markdown("## ✨ Sample of the Dataset")
 st.dataframe(data_full.sample(5)[["TEXT", "Label", "Emoji"]], use_container_width=True)
 
 # 2. Show all emojis in the dataset
-st.markdown("## 😍 All Emojis in Dataset")
+st.markdown("## All Emojis in Dataset! ")
 unique_emojis = pd.DataFrame(data_full['Emoji'].unique(), columns=["Emoji"])
 st.dataframe(unique_emojis, use_container_width=True)
 
