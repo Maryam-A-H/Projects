@@ -214,14 +214,4 @@ if sentence:
     st.markdown(f"### Predicted Emoji: {predicted_emoji}")
     st.write(f"Model used: **{model_option}**")
 
-# Educational note (unchanged)
-st.markdown("---")
-st.markdown("### 🧠 How does this teach Data Science?")
-st.write("""
-- Uses precomputed sentence embeddings for fast training.
-- Loads or trains multiple classifiers.
-- Maps text inputs to emojis as a prediction task.
-- Lets you dynamically sample your dataset for fast experimentation.
-""")
-
 
