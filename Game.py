@@ -156,6 +156,9 @@ model_explanations = {
 
 model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest"])
 
+st.markdown(f"### 🤖 How this model works:")
+st.info(model_explanations)
+
 # Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
