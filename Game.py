@@ -41,6 +41,45 @@ emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
 
+
+# Embeddings explanation with image
+st.markdown("## 🤔 What are Embeddings?")
+image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
+if os.path.exists(image_path):
+    image = Image.open(image_path)
+    st.image(image, caption="This is a PNG image", use_container_width=True)
+else:
+    st.warning("Embedding explanation image not found.")
+
+# Load embeddings
+@st.cache_data
+def load_embeddings(sampling_type):
+    if sampling_type == "Stratified":
+        return np.load("train_embeddings_sampled.npy")
+    elif sampling_type == "Balanced":
+        return np.load("train_embeddings_balanced_sampled.npy")
+    else:
+        return np.load("train_embeddings_sampled.npy")
+
+with st.spinner("Loading embeddings..."):
+    X_embeddings_full = load_embeddings(sampling_type)
+    sampled_indices = data.index.tolist()
+    X_embeddings = X_embeddings_full[sampled_indices]
+
+st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
+
+# Controls within main page
+st.markdown("## ⚙️ Sampling & Model Selection")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
+with col2:
+    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
+with col3:
+    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
+
+
 # Sampling functions
 @st.cache_data
 def stratified_sample(data, frac):
@@ -93,33 +132,6 @@ chart = (
     .properties(title="Sampled Data Label Distribution", width=600, height=350)
 )
 st.altair_chart(chart, use_container_width=True)
-
-# Embeddings explanation with image
-st.markdown("## 🤔 What are Embeddings?")
-image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
-if os.path.exists(image_path):
-    image = Image.open(image_path)
-    st.image(image, caption="This is a PNG image", use_container_width=True)
-else:
-    st.warning("Embedding explanation image not found.")
-
-# Load embeddings
-@st.cache_data
-def load_embeddings(sampling_type):
-    if sampling_type == "Stratified":
-        return np.load("train_embeddings_sampled.npy")
-    elif sampling_type == "Balanced":
-        return np.load("train_embeddings_balanced_sampled.npy")
-    else:
-        return np.load("train_embeddings_sampled.npy")
-
-with st.spinner("Loading embeddings..."):
-    X_embeddings_full = load_embeddings(sampling_type)
-    sampled_indices = data.index.tolist()
-    X_embeddings = X_embeddings_full[sampled_indices]
-
-st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
-
 # Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
@@ -159,17 +171,6 @@ embedder = get_embedder()
 def embed_sentence(sentence):
     return embedder.encode([sentence], convert_to_tensor=False)
     
-# Controls within main page
-st.markdown("## ⚙️ Sampling & Model Selection")
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
-with col2:
-    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
-with col3:
-    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
-
 
 
 # Prediction input
