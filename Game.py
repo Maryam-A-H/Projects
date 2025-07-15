@@ -50,7 +50,12 @@ unique_emojis = pd.DataFrame(data_full['Emoji'].unique(), columns=["Emoji"])
 st.dataframe(unique_emojis, use_container_width=True)
 
 # 3. Explain embeddings with image
-st.markdown("## 🤔 How does the computer understand text?")
+st.markdown("""
+### 🧠💬 How does the computer understand text?
+
+Computers can’t read words like we do. They turn sentences into numbers, kind of like secret codes (using embedding), so they can understand what the words *mean* and find patterns. It’s like giving the computer a way to feel what the sentence is saying, even though it doesn’t speak our language.
+""")
+
 image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
 if os.path.exists(image_path):
     image = Image.open(image_path)
