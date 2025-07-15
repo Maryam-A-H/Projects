@@ -146,7 +146,7 @@ st.markdown("## Pick a Model!")
 model_explanations = {
     "Logistic Regression": """
     **Logistic Regression** is like a magic sorting hat.  
-    It looks at features and guesses if something is one thing or another — like deciding if a pet is a cat or a dog by drawing a line between groups.
+    It looks at features and guesses if something is one thing or another, like deciding if a pet is a cat or a dog by drawing a line between groups.
     """,
     "Random Forest": """
     **Random Forest** is like asking a group of friends to guess.  
