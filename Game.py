@@ -14,13 +14,6 @@ import os
 # Page config
 st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖", layout="wide")
 
-# Sidebar controls
-st.sidebar.header("⚙️ Controls")
-
-sample_frac = st.sidebar.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
-sampling_type = st.sidebar.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
-model_option = st.sidebar.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
-
 # Title
 st.markdown(
     """
@@ -47,9 +40,16 @@ def load_mapping():
 emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
-# Display dataset sample
-st.markdown("## ✨ Sample Twitter Text with Emoji")
-st.dataframe(data_full.sample(10)[["TEXT", "Label", "Emoji"]], use_container_width=True)
+# Controls within main page
+st.markdown("## ⚙️ Sampling & Model Selection")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
+with col2:
+    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
+with col3:
+    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
 # Sampling functions
 @st.cache_data
@@ -82,6 +82,10 @@ with st.spinner("Sampling data..."):
         data = simple_random_sample(data_full, sample_frac)
 
 st.markdown(f"### 📊 Using {sampling_type} sampled data: {data.shape}")
+
+# Display dataset sample
+st.markdown("#### ✨ Sample Tweets with Emojis")
+st.dataframe(data.sample(10)[["TEXT", "Label", "Emoji"]], use_container_width=True)
 
 # Label distribution chart
 label_counts = data['Label'].value_counts().reset_index()
@@ -189,5 +193,6 @@ st.markdown("""
 Built by [Your Name] | 🤖 AI Emoji Predictor | 📝 [GitHub](your-repo-link)
 </p>
 """, unsafe_allow_html=True)
+
 
 
