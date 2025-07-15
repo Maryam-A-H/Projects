@@ -115,7 +115,23 @@ with st.spinner("Loading embeddings..."):
     sampled_indices = data.index.tolist()
     X_embeddings = X_embeddings_full[sampled_indices]
 
-st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
+# Label distribution chart
+label_counts = data['Label'].value_counts().reset_index()
+label_counts.columns = ['Label', 'Count']
+label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping).fillna(label_counts['Label'].astype(str))
+
+chart = (
+    alt.Chart(label_counts)
+    .mark_bar(color='lightgreen')
+    .encode(
+        x=alt.X('Emoji:N', title='Emoji', sort=None),
+        y=alt.Y('Count:Q', title='Count'),
+        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
+    )
+    .properties(title="Sampled Data Label Distribution", width=600, height=350)
+)
+st.altair_chart(chart, use_container_width=True)
+
 
 # 5. Model selection
 st.markdown("## 🧠 Choose a Model")
