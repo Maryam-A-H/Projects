@@ -8,27 +8,28 @@ from sklearn.svm import SVC
 from sentence_transformers import SentenceTransformer
 import joblib
 import altair as alt
+from PIL import Image
+import os
 
 # Page config
-st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖")
+st.set_page_config(page_title="Sentence to Emoji Predictor", page_icon="🤖", layout="wide")
+
+# Sidebar controls
+st.sidebar.header("⚙️ Controls")
+
+sample_frac = st.sidebar.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
+sampling_type = st.sidebar.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
+model_option = st.sidebar.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
 # Title
 st.markdown(
     """
-    <h1 style='
-        text-align: center; 
-        color: green; 
-        text-shadow: 2px 2px 4px #000000;
-        font-family: "Arial Black", Gadget, sans-serif;
-        letter-spacing: 2px;
-    '>
+    <h1 style='text-align: center; color: green; text-shadow: 2px 2px 4px #000000; font-family: "Arial Black"; letter-spacing: 2px;'>
         🤖 Sentence to Emoji Predictor
     </h1>
     """,
     unsafe_allow_html=True
 )
-
-st.write("### Pre-Processing Data")
 
 # Load dataset
 @st.cache_data
@@ -44,15 +45,11 @@ def load_mapping():
     return mapping.squeeze().to_dict()
 
 emoji_mapping = load_mapping()
-
-# Map labels to emojis
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
-st.write("Full dataset loaded:", data_full.shape)
-st.write("### Sample Twitter Text with Emoji")
-st.write(data_full.sample(15)[["TEXT", "Label", "Emoji"]])
-
-st.write(data_full["Emoji"].unique())
+# Display dataset sample
+st.markdown("## ✨ Sample Twitter Text with Emoji")
+st.dataframe(data_full.sample(10)[["TEXT", "Label", "Emoji"]], use_container_width=True)
 
 # Sampling functions
 @st.cache_data
@@ -74,51 +71,26 @@ def balanced_sample(data):
 @st.cache_data
 def simple_random_sample(data, frac):
     return data.sample(frac=frac, random_state=42).reset_index(drop=True)
-# Sampling controls with session state to remember choice
-sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
 
-# Initialize session_state keys if not exist
-if 'sampling_type' not in st.session_state:
-    st.session_state['sampling_type'] = None
-if 'model_option' not in st.session_state:
-    st.session_state['model_option'] = "Logistic Regression"
+# Apply sampling
+with st.spinner("Sampling data..."):
+    if sampling_type == "Stratified":
+        data = stratified_sample(data_full, sample_frac)
+    elif sampling_type == "Balanced":
+        data = balanced_sample(data_full)
+    else:
+        data = simple_random_sample(data_full, sample_frac)
 
-col1, col2, col3 = st.columns(3)
+st.markdown(f"### 📊 Using {sampling_type} sampled data: {data.shape}")
 
-if col1.button("Stratified Sampling"):
-    st.session_state['sampling_type'] = "stratified"
-
-if col2.button("Balanced Sampling"):
-    st.session_state['sampling_type'] = "balanced"
-
-if col3.button("Simple Random Sampling"):
-    st.session_state['sampling_type'] = "simple"
-
-# Default sampling if none selected
-if st.session_state['sampling_type'] is None:
-    st.write("No sampling method selected yet. Using balanced sampling as default.")
-    st.session_state['sampling_type'] = "balanced"
-
-sampling_type = st.session_state['sampling_type']
-
-# Load sampled data based on sampling_type
-if sampling_type == "stratified":
-    data = stratified_sample(data_full, sample_frac)
-elif sampling_type == "balanced":
-    data = balanced_sample(data_full)
-else:
-    data = simple_random_sample(data_full, sample_frac)
-
-st.write(f"Using {sampling_type} sampled data: {data.shape}")
-
-# Label counts and chart (unchanged)
+# Label distribution chart
 label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
 label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping).fillna(label_counts['Label'].astype(str))
 
 chart = (
     alt.Chart(label_counts)
-    .mark_bar(color='skyblue')
+    .mark_bar(color='lightgreen')
     .encode(
         x=alt.X('Emoji:N', title='Emoji', sort=None),
         y=alt.Y('Count:Q', title='Count'),
@@ -128,54 +100,40 @@ chart = (
 )
 st.altair_chart(chart, use_container_width=True)
 
-st.write("### Whats Embeddings? ")
-
-import streamlit as st
-from PIL import Image
-
-import os
-
+# Embeddings explanation with image
+st.markdown("## 🤔 What are Embeddings?")
 image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
 if os.path.exists(image_path):
     image = Image.open(image_path)
     st.image(image, caption="This is a PNG image", use_container_width=True)
 else:
-    st.error(f"Image file not found: {image_path}")
+    st.warning("Embedding explanation image not found.")
 
-
-st.write("### Give it a try? ")
-# Load embeddings according to sampling_type
+# Load embeddings
 @st.cache_data
 def load_embeddings(sampling_type):
-    if sampling_type == "stratified":
+    if sampling_type == "Stratified":
         return np.load("train_embeddings_sampled.npy")
-    elif sampling_type == "balanced":
+    elif sampling_type == "Balanced":
         return np.load("train_embeddings_balanced_sampled.npy")
     else:
         return np.load("train_embeddings_sampled.npy")
 
-X_embeddings_full = load_embeddings(sampling_type)
-sampled_indices = data.index.tolist()
-X_embeddings = X_embeddings_full[sampled_indices]
-st.write("Embeddings shape (sampled):", X_embeddings.shape)
+with st.spinner("Loading embeddings..."):
+    X_embeddings_full = load_embeddings(sampling_type)
+    sampled_indices = data.index.tolist()
+    X_embeddings = X_embeddings_full[sampled_indices]
+
+st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
 
 # Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
-# Model selection with session_state persistence
-model_option = st.selectbox(
-    "Select model:",
-    ["Logistic Regression", "Random Forest", "Support Vector Machine"],
-    index=["Logistic Regression", "Random Forest", "Support Vector Machine"].index(st.session_state['model_option'])
-)
-
-st.session_state['model_option'] = model_option
-
 # Load or train model
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    if sampling_type == "balanced":
+    if sampling_type == "Balanced":
         filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
     else:
         filename = f"{name.lower().replace(' ', '_')}_model.joblib"
@@ -193,9 +151,10 @@ def get_model(name, X, y, sampling_type):
         joblib.dump(model, filename)
     return model
 
-model = get_model(model_option, X_embeddings, y_encoded, sampling_type)
+with st.spinner(f"Loading {model_option} model..."):
+    model = get_model(model_option, X_embeddings, y_encoded, sampling_type)
 
-# Embedder & Prediction input (unchanged)
+# Embedder
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
@@ -206,14 +165,29 @@ embedder = get_embedder()
 def embed_sentence(sentence):
     return embedder.encode([sentence], convert_to_tensor=False)
 
-sentence = st.text_input("Write a sentence:", "I love pizza")
+# Prediction input
+st.markdown("## ✍️ Write a sentence to predict its emoji")
+sentence = st.text_input("Your sentence here:", "I love pizza")
 
 if sentence:
-    sentence_embedding = embed_sentence(sentence)
-    prediction_encoded = model.predict(sentence_embedding)[0]
-    prediction_label = label_encoder.inverse_transform([prediction_encoded])[0]
-    predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
-    st.markdown(f"### Predicted Emoji: {predicted_emoji}")
-    st.write(f"Model used: **{model_option}**")
+    with st.spinner("Predicting emoji..."):
+        sentence_embedding = embed_sentence(sentence)
+        prediction_encoded = model.predict(sentence_embedding)[0]
+        prediction_label = label_encoder.inverse_transform([prediction_encoded])[0]
+        predicted_emoji = emoji_mapping.get(int(prediction_label), prediction_label)
+        probs = model.predict_proba(sentence_embedding)[0]
+        max_prob = np.max(probs)
+
+    st.success(f"### 🎯 Predicted Emoji: {predicted_emoji}")
+    st.write(f"Confidence: {max_prob:.2f}")
+    st.caption(f"Model used: **{model_option}**")
+
+# Footer
+st.markdown("""
+<hr>
+<p style='text-align: center;'>
+Built by [Your Name] | 🤖 AI Emoji Predictor | 📝 [GitHub](your-repo-link)
+</p>
+""", unsafe_allow_html=True)
 
 
