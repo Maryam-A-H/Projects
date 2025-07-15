@@ -83,7 +83,7 @@ Imagine you’re trying to learn about animals, but your classroom has 90 cats a
 If you only look at what most kids are doing (playing with cats), you might forget how dogs behave!
 
 Sampling is like making sure you have enough dogs *and* cats to learn about both.  
-This way, you don’t just get really good at recognizing cats — you also learn to recognize dogs well.  
+This way, you don’t just get really good at recognizing cats but also recognize the dogs.
 It helps the computer not to be lazy and guess only the most common thing.
 """)
 
