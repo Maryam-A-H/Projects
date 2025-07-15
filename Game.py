@@ -129,8 +129,11 @@ st.altair_chart(chart, use_container_width=True)
 st.write("### Whats Embeddings? ")
 st.write("##### Think of it like an Airplane ")
 
-image = Image.open("path_to_your_image.jpg")
-st.image(image, caption="This is a photo", use_column_width=True)
+
+
+image_url = "https://miro.medium.com/max/1400/1*vGvWdxgE1fKdyVUbCgVxjQ.png"  # example image URL from the blog you linked
+st.image(image_url, caption="This is a photo", use_column_width=True)
+
 
 
 
