@@ -128,6 +128,9 @@ def load_embeddings(sampling_type):
 
 X_embeddings_full = load_embeddings(sampling_type)
 
+if sampling_type is None:
+    sampling_type = "balanced"  # default
+    
 X_embeddings = X_embeddings_full[sampled_indices]
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
