@@ -85,9 +85,7 @@ def stratified_sample(data, frac):
 
 @st.cache_data
 def balanced_sample(data, frac=1.0):
-    # Get the maximum class size
     max_class_size = data['Label'].value_counts().max()
-    # Calculate desired sample count per class as a fraction of max class size
     n_samples = max(1, int(max_class_size * frac))
     
     def sample_group(group):
@@ -96,7 +94,7 @@ def balanced_sample(data, frac=1.0):
         else:
             return group.sample(n=n_samples, replace=True, random_state=42)
     
-    return data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
+    return data.groupby('Label', group_keys=False).apply(sample_group)
 
 @st.cache_data
 def simple_random_sample(data, frac):
