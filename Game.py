@@ -40,16 +40,6 @@ def load_mapping():
 emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
-# Controls within main page
-st.markdown("## ⚙️ Sampling & Model Selection")
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
-with col2:
-    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
-with col3:
-    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
 # Sampling functions
 @st.cache_data
@@ -168,6 +158,19 @@ embedder = get_embedder()
 @st.cache_data
 def embed_sentence(sentence):
     return embedder.encode([sentence], convert_to_tensor=False)
+    
+# Controls within main page
+st.markdown("## ⚙️ Sampling & Model Selection")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
+with col2:
+    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
+with col3:
+    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
+
+
 
 # Prediction input
 st.markdown("## ✍️ Write a sentence to predict its emoji")
