@@ -115,7 +115,7 @@ if col1.button("Stratified Sampling"):
 
 if col2.button("Balanced Sampling"):
     data = balanced_sample(data_full, sample_frac)
-    st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of smallest class size per class): {data.shape}")
+    st.write(f"Using balanced sampled data ({sample_frac*100:.1f}% of biggest class size per class): {data.shape}")
 
 if col3.button("Simple Random Sampling"):
     data = simple_random_sample(data_full, sample_frac)
