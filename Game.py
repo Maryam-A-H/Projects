@@ -127,7 +127,6 @@ chart = (
 st.altair_chart(chart, use_container_width=True)
 
 st.write("### Whats Embeddings? ")
-st.write("##### Think of it like an Airplane ")
 
 import streamlit as st
 from PIL import Image
@@ -142,8 +141,7 @@ else:
     st.error(f"Image file not found: {image_path}")
 
 
-
-
+st.write("### Give it a try? ")
 # Load embeddings according to sampling_type
 @st.cache_data
 def load_embeddings(sampling_type):
