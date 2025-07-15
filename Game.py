@@ -132,8 +132,15 @@ st.write("##### Think of it like an Airplane ")
 import streamlit as st
 from PIL import Image
 
-image = Image.open("1HOvcH2lZXWyOtmcqwniahQ.png")  # Replace with your local PNG file path
-st.image(image, caption="This is a PNG image", use_column_width=True)
+import os
+
+image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
+if os.path.exists(image_path):
+    image = Image.open(image_path)
+    st.image(image, caption="This is a PNG image", use_column_width=True)
+else:
+    st.error(f"Image file not found: {image_path}")
+
 
 
 
