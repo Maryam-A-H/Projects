@@ -166,7 +166,7 @@ def get_model(name, X, y, sampling_type):
 
     if sampling_type == "Balanced" and name == "Support Vector Machine":
         # Load SVC balanced model from local path
-        filename = local_path + f"{name.lower().replace(' ', '_')}_{sampling_type}_balanced_model.joblib"
+        filename = local_path + "support_vector_machine_balanced_model.joblib"
     else:
         # Load other models from GitHub/app directory
         filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_balanced_model.joblib" if sampling_type == "Balanced" else f"{name.lower().replace(' ', '_')}_balanced_model.joblib"
