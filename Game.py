@@ -165,7 +165,6 @@ def get_model(name, X, y, sampling_type):
             model = SVC(probability=True)
         model.fit(X, y)
         joblib.dump(model, filename)
-        st.write(f"Trained and saved {name} model to '{filename}'.")
     return model
 
 
