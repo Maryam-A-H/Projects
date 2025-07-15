@@ -76,6 +76,18 @@ def load_embeddings(sampling_type):
 # 4. Sampling controls
 st.markdown("## ⚙️ Sampling")
 
+st.markdown("""
+### 
+
+Imagine you’re trying to learn about animals, but your classroom has 90 cats and only 10 dogs.  
+If you only look at what most kids are doing (playing with cats), you might forget how dogs behave!
+
+Sampling is like making sure you have enough dogs *and* cats to learn about both.  
+This way, you don’t just get really good at recognizing cats — you also learn to recognize dogs well.  
+It helps the computer not to be lazy and guess only the most common thing.
+""")
+
+
 col1, col2 = st.columns(2)
 with col1:
     sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
