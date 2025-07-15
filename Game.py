@@ -52,6 +52,8 @@ st.write("Full dataset loaded:", data_full.shape)
 st.write("### Sample Twitter Text with Emoji")
 st.write(data_full.sample(15)[["TEXT", "Label", "Emoji"]])
 
+st.write(data_full["Emoji"].unique())
+
 # Sampling functions
 @st.cache_data
 def stratified_sample(data, frac):
