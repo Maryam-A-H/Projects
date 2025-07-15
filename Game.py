@@ -137,7 +137,7 @@ import os
 image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
 if os.path.exists(image_path):
     image = Image.open(image_path)
-    st.image(image, caption="This is a PNG image", use_column_width=True)
+    st.image(image, caption="This is a PNG image", use_container_width=True)
 else:
     st.error(f"Image file not found: {image_path}")
 
