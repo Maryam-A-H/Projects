@@ -162,7 +162,7 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
     # Define local path for SVC balanced model only
-    local_path = 'C:/Users/maryamahmed/Downloads/'
+    local_path = '/Users/maryamahmed/Downloads/'
 
     if sampling_type == "Balanced" and name == "Support Vector Machine":
         # Load SVC balanced model from local path
