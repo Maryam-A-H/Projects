@@ -129,11 +129,11 @@ st.altair_chart(chart, use_container_width=True)
 st.write("### Whats Embeddings? ")
 st.write("##### Think of it like an Airplane ")
 
+import streamlit as st
+from PIL import Image
 
-
-image_url = "https://miro.medium.com/max/1400/1*vGvWdxgE1fKdyVUbCgVxjQ.png"  # example image URL from the blog you linked
-st.image(image_url, caption="This is a photo", use_column_width=True)
-
+image = Image.open("1HOvcH2lZXWyOtmcqwniahQ.png")  # Replace with your local PNG file path
+st.image(image, caption="This is a PNG image", use_column_width=True)
 
 
 
