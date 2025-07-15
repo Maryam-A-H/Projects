@@ -159,17 +159,17 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 
 
 
-# Load or train model
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    # Model files are stored on GitHub except for the Balanced sampling models,
-    # which are stored locally on your computer.
-    if sampling_type == "Balanced":
-        # Local path for Balanced sampling models
-        filename = '/Users/maryamahmed/Downloads/' + f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
+    # Define local path for SVC balanced model only
+    local_path = '/Users/maryamahmed/Downloads/'
+
+    if sampling_type == "Balanced" and name == "Support Vector Machine":
+        # Load SVC balanced model from local path
+        filename = local_path + f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
     else:
-        # GitHub-hosted model files (assumed to be in the app directory)
-        filename = f"{name.lower().replace(' ', '_')}_model.joblib"
+        # Load other models from GitHub/app directory
+        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib" if sampling_type == "Balanced" else f"{name.lower().replace(' ', '_')}_model.joblib"
 
     try:
         model = joblib.load(filename)
