@@ -60,7 +60,7 @@ def stratified_sample(data, frac):
 
 @st.cache_data
 def balanced_sample(data):
-    n_samples = 500
+    n_samples = 500*(sample_frac)
     def sample_group(group):
         if len(group) >= n_samples:
             return group.sample(n=n_samples, random_state=42)
