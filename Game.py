@@ -90,7 +90,7 @@ col1, col2 = st.columns(2)
 with col1:
     sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
 with col2:
-    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
+    sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced"])
 
 # Sampling functions
 @st.cache_data
@@ -119,8 +119,6 @@ with st.spinner("Sampling data..."):
         data = stratified_sample(data_full, sample_frac)
     elif sampling_type == "Balanced":
         data = balanced_sample(data_full)
-    else:
-        data = simple_random_sample(data_full, sample_frac)
 
 st.markdown(f"### 📊 Sampled Data: {data.shape}")
 
