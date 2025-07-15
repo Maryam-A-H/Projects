@@ -41,33 +41,6 @@ emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
 
-
-# Embeddings explanation with image
-st.markdown("## 🤔 What are Embeddings?")
-image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
-if os.path.exists(image_path):
-    image = Image.open(image_path)
-    st.image(image, caption="This is a PNG image", use_container_width=True)
-else:
-    st.warning("Embedding explanation image not found.")
-
-# Load embeddings
-@st.cache_data
-def load_embeddings(sampling_type):
-    if sampling_type == "Stratified":
-        return np.load("train_embeddings_sampled.npy")
-    elif sampling_type == "Balanced":
-        return np.load("train_embeddings_balanced_sampled.npy")
-    else:
-        return np.load("train_embeddings_sampled.npy")
-
-with st.spinner("Loading embeddings..."):
-    X_embeddings_full = load_embeddings(sampling_type)
-    sampled_indices = data.index.tolist()
-    X_embeddings = X_embeddings_full[sampled_indices]
-
-st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
-
 # Controls within main page
 st.markdown("## ⚙️ Sampling & Model Selection")
 
@@ -115,6 +88,33 @@ st.markdown(f"### 📊 Using {sampling_type} sampled data: {data.shape}")
 # Display dataset sample
 st.markdown("#### ✨ Sample Tweets with Emojis")
 st.dataframe(data.sample(10)[["TEXT", "Label", "Emoji"]], use_container_width=True)
+
+# Embeddings explanation with image
+st.markdown("## 🤔 What are Embeddings?")
+image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
+if os.path.exists(image_path):
+    image = Image.open(image_path)
+    st.image(image, caption="This is a PNG image", use_container_width=True)
+else:
+    st.warning("Embedding explanation image not found.")
+
+# Load embeddings
+@st.cache_data
+def load_embeddings(sampling_type):
+    if sampling_type == "Stratified":
+        return np.load("train_embeddings_sampled.npy")
+    elif sampling_type == "Balanced":
+        return np.load("train_embeddings_balanced_sampled.npy")
+    else:
+        return np.load("train_embeddings_sampled.npy")
+
+with st.spinner("Loading embeddings..."):
+    X_embeddings_full = load_embeddings(sampling_type)
+    sampled_indices = data.index.tolist()
+    X_embeddings = X_embeddings_full[sampled_indices]
+
+st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
+
 
 # Label distribution chart
 label_counts = data['Label'].value_counts().reset_index()
