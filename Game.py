@@ -158,28 +158,20 @@ label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
 
-
-import streamlit as st
-import joblib
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    # Define local path for SVC balanced model only
-    local_path = '/Users/maryamahmed/Downloads/'
-
-    if sampling_type == "Balanced" and name == "Support Vector Machine":
-        # Load SVC balanced model from local path on your computer
-        filename = local_path + "support_vector_machine_balanced_model.joblib"
+    # Model files are stored on GitHub except for the Balanced sampling models,
+    # which are stored locally on your computer.
+    if sampling_type == "Balanced":
+        # Local path for Balanced sampling models
+        filename = '/Users/maryamahmed/Downloads/' + f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
     else:
-        # Load other models from GitHub/app directory (or wherever)
-        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_balanced_model.joblib"
+        # GitHub-hosted model files (assumed to be in the app directory)
+        filename = f"{name.lower().replace(' ', '_')}_model.joblib"
+
     try:
         model = joblib.load(filename)
     except Exception:
-        # If loading fails, create, fit and save the model
         if name == "Logistic Regression":
             model = LogisticRegression(max_iter=1000)
         elif name == "Random Forest":
@@ -188,7 +180,6 @@ def get_model(name, X, y, sampling_type):
             model = SVC(probability=True)
         model.fit(X, y)
         joblib.dump(model, filename)
-
     return model
 
 
