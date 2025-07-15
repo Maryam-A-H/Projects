@@ -162,11 +162,12 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
     if name == "Logistic Regression":
-            model = LogisticRegression(max_iter=1000)
+        model = LogisticRegression(max_iter=1000)
     elif name == "Random Forest":
-            model = RandomForestClassifier()
+        model = RandomForestClassifier()
     else:
-            model = SVC(probability=True)
+        model = SVC(probability=True)
+
     model.fit(X, y)
     return model
 
