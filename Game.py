@@ -40,18 +40,42 @@ def load_mapping():
 emoji_mapping = load_mapping()
 data_full["Emoji"] = data_full["Label"].map(emoji_mapping)
 
+# 1. Show dataset sample (5 rows)
+st.markdown("## ✨ Sample of the Dataset")
+st.dataframe(data_full.sample(5)[["TEXT", "Label", "Emoji"]], use_container_width=True)
 
-# Controls within main page
-st.markdown("## ⚙️ Sampling & Model Selection")
+# 2. Show all emojis in the dataset
+st.markdown("## 😍 All Emojis in Dataset")
+unique_emojis = pd.DataFrame(data_full['Emoji'].unique(), columns=["Emoji"])
+st.dataframe(unique_emojis, use_container_width=True)
 
-col1, col2, col3 = st.columns(3)
+# 3. Explain embeddings with image
+st.markdown("## 🤔 How does the computer understand text?")
+image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
+if os.path.exists(image_path):
+    image = Image.open(image_path)
+    st.image(image, caption="Embeddings explained visually", use_container_width=True)
+else:
+    st.warning("Embedding explanation image not found.")
+
+# Load embeddings
+@st.cache_data
+def load_embeddings(sampling_type):
+    if sampling_type == "Stratified":
+        return np.load("train_embeddings_sampled.npy")
+    elif sampling_type == "Balanced":
+        return np.load("train_embeddings_balanced_sampled.npy")
+    else:
+        return np.load("train_embeddings_sampled.npy")
+
+# 4. Sampling controls
+st.markdown("## ⚙️ Sampling")
+
+col1, col2 = st.columns(2)
 with col1:
     sample_frac = st.slider("Sample fraction", 0.01, 1.0, 0.1, 0.01)
 with col2:
     sampling_type = st.radio("Sampling Method", ["Stratified", "Balanced", "Simple Random"])
-with col3:
-    model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
-
 
 # Sampling functions
 @st.cache_data
@@ -62,12 +86,12 @@ def stratified_sample(data, frac):
 
 @st.cache_data
 def balanced_sample(data):
-    n_samples = 500*(sample_frac)
+    n_samples = 500 * sample_frac
     def sample_group(group):
         if len(group) >= n_samples:
-            return group.sample(n=n_samples, random_state=42)
+            return group.sample(n=int(n_samples), random_state=42)
         else:
-            return group.sample(n=n_samples, replace=True, random_state=42)
+            return group.sample(n=int(n_samples), replace=True, random_state=42)
     return data.groupby('Label', group_keys=False).apply(sample_group).reset_index(drop=True)
 
 @st.cache_data
@@ -83,31 +107,9 @@ with st.spinner("Sampling data..."):
     else:
         data = simple_random_sample(data_full, sample_frac)
 
-st.markdown(f"### 📊 Using {sampling_type} sampled data: {data.shape}")
+st.markdown(f"### 📊 Sampled Data: {data.shape}")
 
-# Display dataset sample
-st.markdown("#### ✨ Sample Tweets with Emojis")
-st.dataframe(data.sample(10)[["TEXT", "Label", "Emoji"]], use_container_width=True)
-
-# Embeddings explanation with image
-st.markdown("## 🤔 What are Embeddings?")
-image_path = "1HOvcH2lZXWyOtmcqwniahQ.png"
-if os.path.exists(image_path):
-    image = Image.open(image_path)
-    st.image(image, caption="This is a PNG image", use_container_width=True)
-else:
-    st.warning("Embedding explanation image not found.")
-
-# Load embeddings
-@st.cache_data
-def load_embeddings(sampling_type):
-    if sampling_type == "Stratified":
-        return np.load("train_embeddings_sampled.npy")
-    elif sampling_type == "Balanced":
-        return np.load("train_embeddings_balanced_sampled.npy")
-    else:
-        return np.load("train_embeddings_sampled.npy")
-
+# Load embeddings for sampled data
 with st.spinner("Loading embeddings..."):
     X_embeddings_full = load_embeddings(sampling_type)
     sampled_indices = data.index.tolist()
@@ -115,23 +117,11 @@ with st.spinner("Loading embeddings..."):
 
 st.write("✅ Embeddings shape (sampled):", X_embeddings.shape)
 
+# 5. Model selection
+st.markdown("## 🧠 Choose a Model")
 
-# Label distribution chart
-label_counts = data['Label'].value_counts().reset_index()
-label_counts.columns = ['Label', 'Count']
-label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping).fillna(label_counts['Label'].astype(str))
+model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
-chart = (
-    alt.Chart(label_counts)
-    .mark_bar(color='lightgreen')
-    .encode(
-        x=alt.X('Emoji:N', title='Emoji', sort=None),
-        y=alt.Y('Count:Q', title='Count'),
-        tooltip=[alt.Tooltip('Label:N'), alt.Tooltip('Count:Q')]
-    )
-    .properties(title="Sampled Data Label Distribution", width=600, height=350)
-)
-st.altair_chart(chart, use_container_width=True)
 # Encode labels
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
@@ -170,10 +160,8 @@ embedder = get_embedder()
 @st.cache_data
 def embed_sentence(sentence):
     return embedder.encode([sentence], convert_to_tensor=False)
-    
 
-
-# Prediction input
+# 6. Sentence input and prediction
 st.markdown("## ✍️ Write a sentence to predict its emoji")
 sentence = st.text_input("Your sentence here:", "I love pizza")
 
@@ -197,6 +185,7 @@ st.markdown("""
 Built by [Your Name] | 🤖 AI Emoji Predictor | 📝 [GitHub](your-repo-link)
 </p>
 """, unsafe_allow_html=True)
+
 
 
 
