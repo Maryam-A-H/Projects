@@ -3,3 +3,12 @@ scikit-learn
 pandas
 numpy
 sentence-transformers
+streamlit
+scikit-learn
+sentence-transformers
+pandas
+numpy
+altair
+joblib
+Pillow
+streamlit-lottie
