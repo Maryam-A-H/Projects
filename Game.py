@@ -151,7 +151,7 @@ st.altair_chart(chart, use_container_width=True)
 # 5. Model selection
 st.markdown("## 🧠 Choose a Model")
 
-model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
+model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest"])
 
 # Encode labels
 label_encoder = LabelEncoder()
