@@ -175,8 +175,7 @@ def get_model(name, X, y, sampling_type):
         filename = local_path + "support_vector_machine_balanced_model.joblib"
     else:
         # Load other models from GitHub/app directory (or wherever)
-        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_balanced_model.joblib" if sampling_type == "Balanced" else f"{name.lower().replace(' ', '_')}_balanced_model.joblib"
-
+        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_balanced_model.joblib"
     try:
         model = joblib.load(filename)
     except Exception:
