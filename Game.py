@@ -161,14 +161,7 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 # Load or train model
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    if sampling_type == "Balanced":
-        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
-    else:
-        filename = f"{name.lower().replace(' ', '_')}_model.joblib"
 
-    try:
-        model = joblib.load(filename)
-    except Exception:
         if name == "Logistic Regression":
             model = LogisticRegression(max_iter=1000)
         elif name == "Random Forest":
