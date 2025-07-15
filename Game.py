@@ -86,7 +86,7 @@ def stratified_sample(data, frac):
 @st.cache_data
 def balanced_sample(data, frac=1.0):
     max_class_size = data['Label'].value_counts().max()
-    n_samples = max(1, int(max_class_size * frac))
+    n_samples = 500
     
     def sample_group(group):
         if len(group) >= n_samples:
@@ -149,13 +149,36 @@ chart = (
 
 st.altair_chart(chart, use_container_width=True)
 
-##N#@@@
+
 # Load embeddings (full dataset)
+
 @st.cache_data
-def load_embeddings():
+def load_balanced_embeddings():
+    return np.load("train_embeddings_balanced_sampled.npy")  # Make sure path matches
+
+def load_stratified_embeddings():
     return np.load("train_embeddings_sampled.npy")  # Make sure path matches
 
-X_embeddings_full = load_embeddings()
+def load_simple_embeddings():
+    return np.load("train_embeddings_sampled.npy")  # Make sure path matches
+
+# Balanced
+
+sampling_type = None
+
+if col1.button("Stratified Sampling"):
+    X_embeddings_full = load_stratified_embeddings()
+    sampling_type = "stratified"
+
+if col2.button("Balanced Sampling"):
+    X_embeddings_full = load_balanced_embeddings()
+    sampling_type = "balanced"
+
+# Default fallback
+if sampling_type is None:
+    X_embeddings_full = load_balanced_embeddings()
+    sampling_type = "balanced"
+
 
 # Select embeddings corresponding to sampled data rows
 sampled_indices = data.index.tolist()
@@ -171,6 +194,26 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
 # Load or train model
+
+
+@st.cache_resource
+def get_model(name, X, y, sampling_type):
+    filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
+    try:
+        model = joblib.load(filename)
+        st.write(f"Loaded saved {name} model for {sampling_type} sampling.")
+    except Exception:
+        if name == "Logistic Regression":
+            model = LogisticRegression(max_iter=1000)
+        elif name == "Random Forest":
+            model = RandomForestClassifier()
+        else:
+            model = SVC(probability=True)
+        model.fit(X, y)
+        joblib.dump(model, filename)
+        st.write(f"Trained and saved {name} model for {sampling_type} sampling.")
+    return model
+
 @st.cache_resource
 def get_model(name, X, y):
     filename = f"{name.lower().replace(' ', '_')}_model.joblib"
@@ -187,7 +230,8 @@ def get_model(name, X, y):
         model.fit(X, y)
         joblib.dump(model, filename)
         st.write(f"Trained and saved {name} model.")
-    return model
+    
+    #return model
 
 model = get_model(model_option, X_embeddings, y_encoded)
 
