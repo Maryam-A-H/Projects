@@ -155,7 +155,6 @@ def get_model(name, X, y, sampling_type):
     
     try:
         model = joblib.load(filename)
-        st.write(f"Loaded saved {name} model from '{filename}'.")
     except Exception:
         if name == "Logistic Regression":
             model = LogisticRegression(max_iter=1000)
