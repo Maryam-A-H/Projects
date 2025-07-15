@@ -77,7 +77,6 @@ def load_embeddings(sampling_type):
 st.markdown("## ⚙️ Sampling")
 
 st.markdown("""
-### 
 Imagine you’re trying to learn about animals, but your classroom has 90 cats and only 10 dogs.  
 If you only look at what most kids are doing (playing with cats), you might forget how dogs behave!
 
