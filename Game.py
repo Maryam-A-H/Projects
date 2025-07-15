@@ -28,7 +28,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.write("## Pre-Processing Data")
+st.write("### Pre-Processing Data")
 
 # Load dataset
 @st.cache_data
@@ -125,6 +125,14 @@ chart = (
     .properties(title="Sampled Data Label Distribution", width=600, height=350)
 )
 st.altair_chart(chart, use_container_width=True)
+
+st.write("### Whats Embeddings? ")
+st.write("##### Think of it like an Airplane ")
+
+image = Image.open("path_to_your_image.jpg")
+st.image(image, caption="This is a photo", use_column_width=True)
+
+
 
 # Load embeddings according to sampling_type
 @st.cache_data
