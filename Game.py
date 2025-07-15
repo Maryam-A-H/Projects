@@ -156,7 +156,7 @@ model_explanations = {
 
 model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest"])
 
-st.markdown("### 🤖 How this model works:")
+st.markdown("### How the model works:")
 st.info(model_explanations[model_option])
 
 
