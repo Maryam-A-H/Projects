@@ -166,7 +166,7 @@ def load_simple_embeddings():
 
 sampling_type = None
 
-if col1.button("Stratified Sampling"):
+if col1.button("Stratified Sampling", key="stratified_button"):
     X_embeddings_full = load_stratified_embeddings()
     sampling_type = "stratified"
 
