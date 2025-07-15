@@ -170,7 +170,7 @@ if col1.button("Stratified Sampling", key="stratified_button"):
     X_embeddings_full = load_stratified_embeddings()
     sampling_type = "stratified"
 
-if col2.button("Balanced Sampling"):
+if col2.button("Balanced Sampling", key="balanced_button"):
     X_embeddings_full = load_balanced_embeddings()
     sampling_type = "balanced"
 
