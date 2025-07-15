@@ -158,15 +158,12 @@ label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
 
+# Load or train model
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    # Model files are stored on GitHub except for the Balanced sampling models,
-    # which are stored locally on your computer.
     if sampling_type == "Balanced":
-        # Local path for Balanced sampling models
-        filename = '/Users/maryamahmed/Downloads/' + f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
+        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
     else:
-        # GitHub-hosted model files (assumed to be in the app directory)
         filename = f"{name.lower().replace(' ', '_')}_model.joblib"
 
     try:
@@ -181,7 +178,6 @@ def get_model(name, X, y, sampling_type):
         model.fit(X, y)
         joblib.dump(model, filename)
     return model
-
 
 with st.spinner(f"Loading {model_option} model..."):
     model = get_model(model_option, X_embeddings, y_encoded, sampling_type)
