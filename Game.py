@@ -173,8 +173,6 @@ def get_model(name, X, y, sampling_type):
             model = LogisticRegression(max_iter=1000)
         elif name == "Random Forest":
             model = RandomForestClassifier()
-        else:
-            model = SVC(probability=True)
         model.fit(X, y)
         joblib.dump(model, filename)
     return model
