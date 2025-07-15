@@ -128,12 +128,6 @@ def load_embeddings(sampling_type):
 
 X_embeddings_full = load_embeddings(sampling_type)
 
-# Validate embedding shape
-sampled_indices = data.index.tolist()
-if max(sampled_indices) >= X_embeddings_full.shape[0]:
-    st.error("Embeddings file does not match sampled data indices. Check your embeddings generation.")
-    st.stop()
-
 X_embeddings = X_embeddings_full[sampled_indices]
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
@@ -145,12 +139,18 @@ y_encoded = label_encoder.fit_transform(data['Label'])
 model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
 
 # Load or train model
+
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
+    # Only add sampling_type suffix if it's 'balanced'
+    if sampling_type == "balanced":
+        filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
+    else:
+        filename = f"{name.lower().replace(' ', '_')}_model.joblib"
+    
     try:
         model = joblib.load(filename)
-        st.write(f"Loaded saved {name} model for {sampling_type} sampling.")
+        st.write(f"Loaded saved {name} model from '{filename}'.")
     except Exception:
         if name == "Logistic Regression":
             model = LogisticRegression(max_iter=1000)
@@ -160,8 +160,9 @@ def get_model(name, X, y, sampling_type):
             model = SVC(probability=True)
         model.fit(X, y)
         joblib.dump(model, filename)
-        st.write(f"Trained and saved {name} model for {sampling_type} sampling.")
+        st.write(f"Trained and saved {name} model to '{filename}'.")
     return model
+
 
 model = get_model(model_option, X_embeddings, y_encoded, sampling_type)
 
