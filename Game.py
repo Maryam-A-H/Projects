@@ -140,7 +140,23 @@ chart = (
 st.altair_chart(chart, use_container_width=True)
 
 # 5. Model selection (only Logistic Regression and Random Forest)
-st.markdown("## 🧠 Choose a Model")
+st.markdown("## Pick a Model!")
+
+# Kid-friendly explanations
+model_explanations = {
+    "Logistic Regression": """
+    **Logistic Regression** is like a magic sorting hat.  
+    It looks at features and guesses if something is one thing or another — like deciding if a pet is a cat or a dog by drawing a line between groups.
+    """,
+    "Random Forest": """
+    **Random Forest** is like asking a group of friends to guess.  
+    Each friend looks at the features and votes, and the most popular guess wins!
+    """
+}
+
+st.markdown(f"### 🤖 How this model works:")
+st.info(model_explanations[model_option])
+
 
 model_option = st.selectbox("Choose Model", ["Logistic Regression", "Random Forest"])
 
