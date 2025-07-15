@@ -72,38 +72,48 @@ def balanced_sample(data):
 @st.cache_data
 def simple_random_sample(data, frac):
     return data.sample(frac=frac, random_state=42).reset_index(drop=True)
-
-# Sampling controls
+# Sampling controls with session state to remember choice
 sample_frac = st.slider("Select sample fraction", 0.01, 1.0, 0.1, 0.01)
-data = None
-sampling_type = None
+
+# Initialize session_state keys if not exist
+if 'sampling_type' not in st.session_state:
+    st.session_state['sampling_type'] = None
+if 'model_option' not in st.session_state:
+    st.session_state['model_option'] = "Logistic Regression"
 
 col1, col2, col3 = st.columns(3)
 
 if col1.button("Stratified Sampling"):
-    data = stratified_sample(data_full, sample_frac)
-    sampling_type = "stratified"
-elif col2.button("Balanced Sampling"):
-    data = balanced_sample(data_full)
-    sampling_type = "balanced"
-elif col3.button("Simple Random Sampling"):
-    data = simple_random_sample(data_full, sample_frac)
-    sampling_type = "simple"
+    st.session_state['sampling_type'] = "stratified"
 
-# Default fallback
-if data is None:
+if col2.button("Balanced Sampling"):
+    st.session_state['sampling_type'] = "balanced"
+
+if col3.button("Simple Random Sampling"):
+    st.session_state['sampling_type'] = "simple"
+
+# Default sampling if none selected
+if st.session_state['sampling_type'] is None:
     st.write("No sampling method selected yet. Using balanced sampling as default.")
+    st.session_state['sampling_type'] = "balanced"
+
+sampling_type = st.session_state['sampling_type']
+
+# Load sampled data based on sampling_type
+if sampling_type == "stratified":
+    data = stratified_sample(data_full, sample_frac)
+elif sampling_type == "balanced":
     data = balanced_sample(data_full)
-    sampling_type = "balanced"
+else:
+    data = simple_random_sample(data_full, sample_frac)
 
 st.write(f"Using {sampling_type} sampled data: {data.shape}")
 
-# Label counts with emojis
+# Label counts and chart (unchanged)
 label_counts = data['Label'].value_counts().reset_index()
 label_counts.columns = ['Label', 'Count']
 label_counts['Emoji'] = label_counts['Label'].map(emoji_mapping).fillna(label_counts['Label'].astype(str))
 
-# Display bar chart
 chart = (
     alt.Chart(label_counts)
     .mark_bar(color='skyblue')
@@ -116,7 +126,7 @@ chart = (
 )
 st.altair_chart(chart, use_container_width=True)
 
-# Load embeddings
+# Load embeddings according to sampling_type
 @st.cache_data
 def load_embeddings(sampling_type):
     if sampling_type == "stratified":
@@ -127,32 +137,31 @@ def load_embeddings(sampling_type):
         return np.load("train_embeddings_sampled.npy")
 
 X_embeddings_full = load_embeddings(sampling_type)
-
 sampled_indices = data.index.tolist()
-
 X_embeddings = X_embeddings_full[sampled_indices]
-
 st.write("Embeddings shape (sampled):", X_embeddings.shape)
 
-
 # Encode labels
-
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(data['Label'])
 
-# Model selection
-model_option = st.selectbox("Select model:", ["Logistic Regression", "Random Forest", "Support Vector Machine"])
+# Model selection with session_state persistence
+model_option = st.selectbox(
+    "Select model:",
+    ["Logistic Regression", "Random Forest", "Support Vector Machine"],
+    index=["Logistic Regression", "Random Forest", "Support Vector Machine"].index(st.session_state['model_option'])
+)
+
+st.session_state['model_option'] = model_option
 
 # Load or train model
-
 @st.cache_resource
 def get_model(name, X, y, sampling_type):
-    # Only add sampling_type suffix if it's 'balanced'
     if sampling_type == "balanced":
         filename = f"{name.lower().replace(' ', '_')}_{sampling_type}_model.joblib"
     else:
         filename = f"{name.lower().replace(' ', '_')}_model.joblib"
-    
+
     try:
         model = joblib.load(filename)
     except Exception:
@@ -166,22 +175,19 @@ def get_model(name, X, y, sampling_type):
         joblib.dump(model, filename)
     return model
 
-
 model = get_model(model_option, X_embeddings, y_encoded, sampling_type)
 
-# Embedder
+# Embedder & Prediction input (unchanged)
 @st.cache_resource
 def get_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
 
 embedder = get_embedder()
 
-# Embed sentence
 @st.cache_data
 def embed_sentence(sentence):
     return embedder.encode([sentence], convert_to_tensor=False)
 
-# Prediction input
 sentence = st.text_input("Write a sentence:", "I love pizza")
 
 if sentence:
@@ -192,7 +198,7 @@ if sentence:
     st.markdown(f"### Predicted Emoji: {predicted_emoji}")
     st.write(f"Model used: **{model_option}**")
 
-# Educational note
+# Educational note (unchanged)
 st.markdown("---")
 st.markdown("### 🧠 How does this teach Data Science?")
 st.write("""
@@ -201,7 +207,5 @@ st.write("""
 - Maps text inputs to emojis as a prediction task.
 - Lets you dynamically sample your dataset for fast experimentation.
 """)
-
-
 
 
